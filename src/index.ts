@@ -1,34 +1,33 @@
-import { Client } from "pg";
-import { query } from "./db/index.js";
+import express from "express";
 import userService from "./user.service.js";
 
-const client = await new Client({
-    // user: process.env.POSTGRES_USER || "",
-    // password: process.env.POSTGRES_PASSWORD || "",
-    // host: "localhost",
-    // port: 5432,
-    // database: '',
-}).connect();
+const app = express();
 
-try {
-    const res = await client.query("SELECT $1::text as message", [
-        "Hello world!",
-    ]);
-    console.log(res.rows[0].message); // Hello world!
+const port = 3000;
 
-    // const res2 = await client.query("SELECT * from users");
-    // console.log(res2.rows); // Hello world!
+app.get("/", (req, res) => {
+    res.send("Hello World!");
+});
 
-    console.log(
-        await userService.insertUser({
-            name: "Ram",
-            age: 14,
-            email: "ram@example.com",
-        }),
-    );
-    console.log(await userService.getUsers());
-} catch (err) {
-    console.error(err);
-} finally {
-    await client.end();
-}
+app.get("/users", async (req, res) => {
+    try {
+        let { page = 1, size = 10 } = req.query as any;
+        if (size > 20) {
+            size = 20;
+        }
+        if (page < 0) {
+            page = 1;
+        }
+        const users = await userService.getUsers({ page, size });
+        const total = await userService.getTotalCount();
+
+        res.send({ users, page, size, total });
+    } catch (error) {
+        console.log("ERROR", error);
+        res.sendStatus(500).send({ error: error });
+    }
+});
+
+app.listen(port, () => {
+    console.log(`Listening on port ${port}`);
+});

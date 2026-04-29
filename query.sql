@@ -15,6 +15,12 @@ CREATE TABLE users (
     age INT
 );
 
+
+-- Alter Table
+
+ALTER TABLE users
+ADD UNIQUE (email);
+
 -- Insert Data
 
 INSERT INTO users (name, email, age)

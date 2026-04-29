@@ -1,0 +1,12 @@
+services:
+    todo-postgres:
+        container_name: todo-postgres
+        image: postgres:alpine
+        restart: always
+        ports:
+            - 5432:5432
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        volumes:
+            - ./docker-data/postgres_data:/var/lib/postgresql

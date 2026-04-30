@@ -19,9 +19,14 @@ app.get("/users", async (req, res) => {
             res.status(400).send(result.error.issues);
             return;
         }
-        const { page, size } = result.data;
+        const { page, size, orderBy, order } = result.data;
 
-        const users = await userService.getUsers({ page, size });
+        const users = await userService.getUsers({
+            page,
+            size,
+            orderBy,
+            order,
+        });
         const total = await userService.getTotalCount();
 
         res.send({ users, page, size, total });

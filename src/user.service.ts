@@ -22,8 +22,13 @@ class UserService {
         return res.rows[0];
     }
 
-    async getUsers(params: { page: number; size: number }) {
-        const q = `SELECT * FROM users OFFSET ${params.size * (params?.page - 1)} LIMIT ${params?.size}`;
+    async getUsers(params: {
+        page: number;
+        size: number;
+        orderBy: "name" | "email" | "age";
+        order: "asc" | "desc";
+    }) {
+        const q = `SELECT * FROM users ORDER BY ${params.orderBy} ${params.order} OFFSET ${params.size * (params?.page - 1)} LIMIT ${params?.size}`;
         return (await query<User>(q)).rows;
     }
 

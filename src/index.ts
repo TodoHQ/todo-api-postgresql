@@ -1,5 +1,7 @@
 import express from "express";
+
 import userService from "./user.service.js";
+import { getUserQuerySchema } from "./schema/user.schema.js";
 
 const app = express();
 
@@ -11,13 +13,14 @@ app.get("/", (req, res) => {
 
 app.get("/users", async (req, res) => {
     try {
-        let { page = 1, size = 10 } = req.query as any;
-        if (size > 20) {
-            size = 20;
+        const result = getUserQuerySchema.safeParse(req.query);
+
+        if (!result.success) {
+            res.status(400).send(result.error.issues);
+            return;
         }
-        if (page < 0) {
-            page = 1;
-        }
+        const { page, size } = result.data;
+
         const users = await userService.getUsers({ page, size });
         const total = await userService.getTotalCount();
 

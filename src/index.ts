@@ -19,17 +19,18 @@ app.get("/users", async (req, res) => {
             res.status(400).send(result.error.issues);
             return;
         }
-        const { page, size, orderBy, order } = result.data;
+        const { page, size, orderBy, order, name } = result.data;
 
         const users = await userService.getUsers({
             page,
             size,
             orderBy,
             order,
+            name,
         });
-        const total = await userService.getTotalCount();
+        const total = await userService.getTotalCount({ name });
 
-        res.send({ users, page, size, total, orderBy, order });
+        res.send({ users, page, size, total, orderBy, order, name });
     } catch (error) {
         console.log("ERROR", error);
         res.sendStatus(500).send({ error: error });

@@ -27,13 +27,19 @@ class UserService {
         size: number;
         orderBy: "name" | "email" | "age" | "created_at" | "updated_at";
         order: "asc" | "desc";
+        name: string | undefined;
     }) {
-        const q = `SELECT * FROM users ORDER BY ${params.orderBy} ${params.order} OFFSET ${params.size * (params?.page - 1)} LIMIT ${params?.size}`;
+        const q = `
+            SELECT * FROM users
+            ${params.name ? `WHERE name ILIKE '%${params.name}%'` : ""}
+            ORDER BY ${params.orderBy} ${params.order} 
+            OFFSET ${params.size * (params?.page - 1)} LIMIT ${params?.size}`;
+
         return (await query<User>(q)).rows;
     }
 
-    async getTotalCount() {
-        const q = `SELECT COUNT(*) FROM users`;
+    async getTotalCount(params: { name: string | undefined }) {
+        const q = `SELECT COUNT(*) FROM users ${params.name ? `WHERE name ILIKE '%${params.name}%'` : ""}`;
         return Number((await query<{ count: string }>(q)).rows[0]?.count);
     }
 }

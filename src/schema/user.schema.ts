@@ -7,4 +7,5 @@ export const getUserQuerySchema = z.object({
         .enum(["name", "email", "age", "created_at", "updated_at"])
         .default("name"),
     order: z.enum(["asc", "desc"]).default("asc"),
+    name: z.string().optional(),
 });

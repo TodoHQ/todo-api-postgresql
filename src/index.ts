@@ -29,7 +29,7 @@ app.get("/users", async (req, res) => {
         });
         const total = await userService.getTotalCount();
 
-        res.send({ users, page, size, total });
+        res.send({ users, page, size, total, orderBy, order });
     } catch (error) {
         console.log("ERROR", error);
         res.sendStatus(500).send({ error: error });

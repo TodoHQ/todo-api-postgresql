@@ -2,6 +2,8 @@ import express from "express";
 
 import userService from "./user.service.js";
 import { getUserQuerySchema } from "./schema/user.schema.js";
+import todoService from "./todo.service.js";
+import { getUserTodoParamSchema } from "./schema/todo.schema.js";
 
 const app = express();
 
@@ -33,7 +35,27 @@ app.get("/users", async (req, res) => {
         res.send({ users, page, size, total, orderBy, order, name });
     } catch (error) {
         console.log("ERROR", error);
-        res.sendStatus(500).send({ error: error });
+        res.status(500).send({ error: error });
+    }
+});
+
+app.get("/users/:user_id/todos", async (req, res) => {
+    try {
+        const result = getUserTodoParamSchema.safeParse(req.params);
+
+        if (!result.success) {
+            res.status(400).send(result.error.issues);
+            return;
+        }
+        const userId = result.data.user_id;
+
+        const todos = await todoService.getUserTodos(userId);
+        const total = await todoService.getUserTodosCount(userId);
+
+        res.send({ todos, total });
+    } catch (error) {
+        console.log("ERROR", error);
+        res.status(500).send({ error: error });
     }
 });
 

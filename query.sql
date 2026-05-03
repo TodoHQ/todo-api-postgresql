@@ -79,3 +79,29 @@ EXECUTE FUNCTION update_updated_at_column();
 UPDATE users
 SET name = "Sachin"
 WHERE id = 1;
+
+-- Create TODO Table
+
+CREATE TABLE todos (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    is_done BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_user
+        FOREIGN KEY(user_id) 
+        REFERENCES users(id)
+        ON DELETE RESTRICT
+);
+
+
+-- Inset in todos
+
+INSERT INTO todos (title, user_id)
+VALUES ('Complete PostgreSQL', 1) RETURNING id, user_id;
+
+INSERT INTO todos (title, user_id)
+VALUES ('Complete PostgreSQL', 1) RETURNING *;

@@ -31,7 +31,7 @@ class UserService {
     }) {
         const q = `
             SELECT * FROM users
-            ${params.name ? `WHERE name ILIKE '%${params.name}%'` : ""}
+            ${params.name ? `WHERE name ILIKE '${params.name}%'` : ""}
             ORDER BY ${params.orderBy} ${params.order} 
             OFFSET ${params.size * (params?.page - 1)} LIMIT ${params?.size}`;
 
@@ -39,7 +39,7 @@ class UserService {
     }
 
     async getTotalCount(params: { name: string | undefined }) {
-        const q = `SELECT COUNT(*) FROM users ${params.name ? `WHERE name ILIKE '%${params.name}%'` : ""}`;
+        const q = `SELECT COUNT(*) FROM users ${params.name ? `WHERE name ILIKE '${params.name}%'` : ""}`;
         return Number((await query<{ count: string }>(q)).rows[0]?.count);
     }
 }

@@ -10,10 +10,12 @@ type Todo = {
 };
 
 class TodoService {
-    async getUserTodos(userId: number) {
+    async getUserTodos(userId: number, params: { page: number; size: number }) {
         const q = `
             SELECT * FROM todos 
-            WHERE user_id = ${userId}`;
+            WHERE user_id = ${userId}
+            OFFSET ${params.size * (params.page - 1)} LIMIT ${params.size}
+            `;
 
         return (await queryRaw<Todo>(q)).rows;
     }

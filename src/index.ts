@@ -3,8 +3,12 @@ import express from "express";
 import userService from "./services/user.service.js";
 import { getUserQuerySchema } from "./schema/user.schema.js";
 import todoService from "./services/todo.service.js";
-import { getUserTodoParamSchema } from "./schema/todo.schema.js";
+import {
+    getUserTodoParamSchema,
+    getUserTodoQuerySchema,
+} from "./schema/todo.schema.js";
 import statsService from "./services/stats.service.js";
+import z from "zod";
 
 const app = express();
 
@@ -46,21 +50,20 @@ app.get("/users", async (req, res) => {
     }
 });
 
-app.get("/users/:user_id/todos", async (req, res) => {
+app.get("/users/:userId/todos", async (req, res) => {
     try {
-        const result = getUserTodoParamSchema.safeParse(req.params);
+        const { userId } = getUserTodoParamSchema.parse(req.params);
+        const { page, size } = getUserTodoQuerySchema.parse(req.query);
 
-        if (!result.success) {
-            res.status(400).send(result.error.issues);
-            return;
-        }
-        const userId = result.data.user_id;
-
-        const todos = await todoService.getUserTodos(userId);
+        const todos = await todoService.getUserTodos(userId, { page, size });
         const total = await todoService.getUserTodosCount(userId);
 
-        res.send({ todos, total });
+        res.send({ todos, total, page, size });
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            res.status(400).send(error.issues);
+            return;
+        }
         console.log("ERROR", error);
         res.status(500).send({ error: error });
     }

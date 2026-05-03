@@ -38,7 +38,52 @@ class StatsService {
             LIMIT 10;
             `);
 
-        return { totalUsers, totalTodos, topUsers, last7DaysTopUsers };
+        const perDayTodos = await query(`
+            SELECT 
+                DATE(created_at) AS day,
+                COUNT(*) AS todos_created
+            FROM todos
+            GROUP BY day
+            ORDER BY day DESC
+            LIMIT 30;
+        `);
+
+        const dominatingUser = await query(`
+            SELECT 
+                CASE 
+                    WHEN cnt < 5 THEN '0-5'
+                    WHEN cnt < 20 THEN '5-20'
+                    WHEN cnt < 50 THEN '20-50'
+                    ELSE '50+'
+                END AS bucket,
+                COUNT(*) AS users
+            FROM (
+                SELECT user_id, COUNT(*) AS cnt
+                FROM todos
+                GROUP BY user_id
+            ) t
+            GROUP BY bucket
+            ORDER BY bucket;
+        `);
+
+        const completionRate = await query(`
+            SELECT 
+                ROUND(
+                    100.0 * SUM(CASE WHEN is_done THEN 1 ELSE 0 END) / COUNT(*),
+                    2
+                ) AS completion_percentage
+            FROM todos;
+        `);
+
+        return {
+            totalUsers,
+            totalTodos,
+            topUsers,
+            last7DaysTopUsers,
+            perDayTodos,
+            dominatingUser,
+            completionRate,
+        };
     }
 }
 

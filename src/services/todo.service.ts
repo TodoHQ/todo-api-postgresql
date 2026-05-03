@@ -1,4 +1,4 @@
-import { query } from "./db/index.js";
+import { queryRaw } from "../db/index.js";
 
 type Todo = {
     id: number;
@@ -15,7 +15,7 @@ class TodoService {
             SELECT * FROM todos 
             WHERE user_id = ${userId}`;
 
-        return (await query<Todo>(q)).rows;
+        return (await queryRaw<Todo>(q)).rows;
     }
 
     async getUserTodosCount(userId: number) {
@@ -23,7 +23,7 @@ class TodoService {
             SELECT COUNT(*) FROM todos 
             WHERE user_id = ${userId}`;
 
-        return Number((await query<{ count: string }>(q)).rows[0]?.count);
+        return Number((await queryRaw<{ count: string }>(q)).rows[0]?.count);
     }
 }
 

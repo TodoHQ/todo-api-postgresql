@@ -1,4 +1,4 @@
-import { query } from "./db/index.js";
+import { queryRaw } from "../db/index.js";
 
 type User = {
     id: number;
@@ -11,7 +11,7 @@ class UserService {
     async insertUser(payload: Pick<User, "name" | "email" | "age">) {
         const { name, email, age } = payload;
 
-        const res = await query<User>(
+        const res = await queryRaw<User>(
             `INSERT INTO users (name, email, age)
             VALUES ($1, $2, $3)
             RETURNING id, name, email, age
@@ -35,12 +35,12 @@ class UserService {
             ORDER BY ${params.orderBy} ${params.order} 
             OFFSET ${params.size * (params?.page - 1)} LIMIT ${params?.size}`;
 
-        return (await query<User>(q)).rows;
+        return (await queryRaw<User>(q)).rows;
     }
 
-    async getTotalCount(params: { name: string | undefined }) {
-        const q = `SELECT COUNT(*) FROM users ${params.name ? `WHERE name ILIKE '${params.name}%'` : ""}`;
-        return Number((await query<{ count: string }>(q)).rows[0]?.count);
+    async getTotalCount(params?: { name?: string | undefined }) {
+        const q = `SELECT COUNT(*) FROM users ${params?.name ? `WHERE name ILIKE '${params.name}%'` : ""}`;
+        return Number((await queryRaw<{ count: string }>(q)).rows[0]?.count);
     }
 }
 

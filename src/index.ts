@@ -1,9 +1,10 @@
 import express from "express";
 
-import userService from "./user.service.js";
+import userService from "./services/user.service.js";
 import { getUserQuerySchema } from "./schema/user.schema.js";
-import todoService from "./todo.service.js";
+import todoService from "./services/todo.service.js";
 import { getUserTodoParamSchema } from "./schema/todo.schema.js";
+import statsService from "./services/stats.service.js";
 
 const app = express();
 
@@ -11,6 +12,12 @@ const port = 3000;
 
 app.get("/", (req, res) => {
     res.send("Hello World!");
+});
+
+app.get("/stats", async (req, res) => {
+    const responseData = await statsService.getStats();
+
+    res.send(responseData);
 });
 
 app.get("/users", async (req, res) => {

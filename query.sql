@@ -105,3 +105,12 @@ VALUES ('Complete PostgreSQL', 1) RETURNING id, user_id;
 
 INSERT INTO todos (title, user_id)
 VALUES ('Complete PostgreSQL', 1) RETURNING *;
+
+
+-- Lists all user-defined functions
+\df
+
+-- List all user-defined functions
+\dS -- for all table
+\dS TABLE_NAME -- For a Specific Table
+
